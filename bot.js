@@ -8,45 +8,45 @@ function createBot() {
         version: '1.21.1'
     })
 
+    const messages = [
+        "Chào cả nhà nhé!",
+        "Bot treo máy giữ chỗ đây.",
+        "Server hôm nay ổn định thật.",
+        "8 người bạn của tôi online chưa?",
+        "Chúc mọi người chơi game vui vẻ!"
+    ];
+
     bot.on('spawn', () => {
-        console.log('Bot đã vào server và đang ở chế độ chống soi hành vi!')
+        console.log('Bot đã vào server - Đã bật Nhảy + Chat ngẫu nhiên!');
         
-        function actRandomly() {
-            // Ngẫu nhiên chọn thời gian từ 20 giây đến 50 giây để làm một hành động
-            const delay = Math.floor(Math.random() * (50000 - 20000 + 1)) + 20000;
-            
+        // Vòng lặp hành động ngẫu nhiên để tránh Pattern Detection
+        function randomAction() {
+            const delay = Math.floor(Math.random() * (45000 - 15000 + 1)) + 15000;
             setTimeout(() => {
-                // Ngẫu nhiên chọn: 1 là nhảy, 2 là xoay người, 3 là đi nhẹ
-                const action = Math.floor(Math.random() * 3) + 1;
-                
-                if (action === 1) {
+                const rand = Math.random();
+                if (rand < 0.4) {
                     bot.setControlState('jump', true);
                     setTimeout(() => bot.setControlState('jump', false), 500);
-                } else if (action === 2) {
-                    const yaw = bot.entity.yaw + (Math.random() - 0.5) * 2;
-                    bot.look(yaw, 0);
+                } else if (rand < 0.7) {
+                    bot.look(bot.entity.yaw + (Math.random() - 0.5), 0);
                 } else {
-                    bot.setControlState('forward', true);
-                    setTimeout(() => bot.setControlState('forward', false), 200);
+                    const msg = messages[Math.floor(Math.random() * messages.length)];
+                    bot.chat(msg);
                 }
-                
-                actRandomly(); // Lặp lại vòng lặp với thời gian ngẫu nhiên mới
+                randomAction();
             }, delay);
         }
-        actRandomly();
-    })
+        randomAction();
+    });
 
     bot.on('chat', (username, message) => {
-        // Chấp nhận mọi yêu cầu dịch chuyển
+        if (username === bot.username) return;
         if (message.toLowerCase().includes('tpa')) {
-            setTimeout(() => {
-                bot.chat('/tpaccept');
-            }, 1000);
+            setTimeout(() => bot.chat('/tpaccept'), 2000);
         }
-    })
+    });
 
     bot.on('end', () => setTimeout(createBot, 10000));
     bot.on('error', err => console.log(err));
 }
-
-createBot()
+createBot();
