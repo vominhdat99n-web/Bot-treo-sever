@@ -6,34 +6,25 @@ function createBot() {
         port: 14845,
         username: 'BotTreoGitHub',
         version: '1.21.1',
-        disableChatSigning: true, // Tắt bảo mật chat để né lỗi văng
-        checkTimeoutInterval: 60000
+        disableChatSigning: true,
+        // Ép bot bỏ qua mọi xử lý tin nhắn để tránh crash
+        checkTimeoutInterval: 30000 
     })
 
     bot.on('spawn', () => {
-        console.log('Bot đã vào! Đã bật bộ lọc chat thô để chống văng.')
-        // Nhảy nhẹ mỗi 30 giây để giữ kết nối
-        setInterval(() => {
-            bot.setControlState('jump', true)
-            setTimeout(() => bot.setControlState('jump', false), 500)
-        }, 30000)
+        console.log('Bot đã online! Đã bật chế độ tự động hồi sinh siêu tốc.')
     })
 
-    // Sử dụng sự kiện 'message' để đọc dữ liệu thô (né lỗi SkinsRestorer và Chat Signing)
-    bot.on('message', (jsonMsg) => {
-        const message = jsonMsg.toString()
-        if (message.toLowerCase().includes('tpa')) {
-            // Delay 1 giây trước khi accept để server kịp xử lý
-            setTimeout(() => bot.chat('/tpaccept'), 1000)
-        }
-    })
-
+    // Khi bị văng, bot sẽ vào lại ngay lập tức
     bot.on('end', () => {
-        console.log('Mất kết nối, đang vào lại sau 5 giây...')
-        setTimeout(createBot, 5000)
+        console.log('Bị kick! Đang vào lại ngay...')
+        setTimeout(createBot, 500) // Vào lại sau 0.5 giây
     })
 
-    bot.on('error', err => console.log('Lỗi: ' + err))
+    bot.on('error', (err) => {
+        if (err.code === 'ECONNREFUSED') return
+        createBot()
+    })
 }
-
 createBot()
+
