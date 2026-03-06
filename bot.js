@@ -6,35 +6,29 @@ function createBot() {
         port: 14845,
         username: 'BotTreoGitHub',
         version: '1.21.1',
-        // Tắt hoàn toàn việc kiểm tra chữ ký tin nhắn
         disableChatSigning: true,
+        // Giảm tầm nhìn xuống tối thiểu để không phải xử lý dữ liệu skin người khác
+        viewDistance: 'tiny', 
         checkTimeoutInterval: 120000
     })
 
-    // Lắng nghe gói tin thô để tránh bị crash bởi hệ thống chat mã hóa
-    bot.on('message', (jsonMsg) => {
-        const message = jsonMsg.toString()
-        // Kiểm tra lệnh TPA từ dòng chat thô
-        if (message.toLowerCase().includes('tpa')) {
-            bot.chat('/tpaccept')
-        }
-    })
-
     bot.on('spawn', () => {
-        console.log('Bot đã vào server và đang ở chế độ bảo mật chat cao!')
-        // Vòng lặp hành động ngẫu nhiên để giữ kết nối
+        console.log('Bot đã vào! Chế độ chống văng do SkinsRestorer đã bật.')
+        // Vận động để giữ kết nối
         setInterval(() => {
             bot.setControlState('jump', true)
             setTimeout(() => bot.setControlState('jump', false), 500)
         }, 30000)
     })
 
-    bot.on('end', () => {
-        console.log('Bot bị ngắt kết nối, đang tự động vào lại sau 10 giây...')
-        setTimeout(createBot, 10000)
+    // Đọc tin nhắn thô để tránh lỗi crash từ plugin chat/skin
+    bot.on('messagestr', (message) => {
+        if (message.toLowerCase().includes('tpa')) {
+            bot.chat('/tpaccept')
+        }
     })
 
-    bot.on('error', err => console.log('Lỗi phát sinh: ' + err))
+    bot.on('end', () => setTimeout(createBot, 5000))
+    bot.on('error', err => console.log('Lỗi: ' + err))
 }
-
 createBot()
