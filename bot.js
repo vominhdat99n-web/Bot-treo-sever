@@ -6,39 +6,33 @@ function createBot() {
         port: 14845,
         username: 'BotTreoGitHub',
         version: '1.21.1',
-        // Chặn lỗi chữ ký tin nhắn khiến bot bị văng khi người khác chat
-        checkTimeoutInterval: 60000,
-        disableChatSigning: true 
+        // Các tùy chọn quan trọng để chống văng khi chat
+        disableChatSigning: true,
+        checkTimeoutInterval: 90000
     })
 
     bot.on('spawn', () => {
-        console.log('Bot đã vào và đã chặn lỗi văng khi chat!')
-        // Nhảy nhẹ mỗi 1 phút để giữ kết nối
+        console.log('Bot đã vào! Chế độ chống văng khi chat đã kích hoạt.')
+        // Nhảy mỗi 45 giây để giữ kết nối
         setInterval(() => {
             bot.setControlState('jump', true)
             setTimeout(() => bot.setControlState('jump', false), 500)
-        }, 60000)
+        }, 45000)
     })
 
-    // Xử lý chat an toàn
-    bot.on('chat', (username, message) => {
-        try {
-            if (username === bot.username) return
-            if (message.toLowerCase().includes('tpa')) {
-                bot.chat('/tpaccept')
-            }
-        } catch (err) {
-            console.log('Lỗi xử lý tin nhắn nhưng không crash bot.')
+    // Sử dụng sự kiện 'messagestr' thay vì 'chat' để tránh lỗi gói tin mã hóa
+    bot.on('messagestr', (message) => {
+        if (message.toLowerCase().includes('tpa')) {
+            bot.chat('/tpaccept')
         }
     })
 
-    // Tự động vào lại sau 5 giây nếu vẫn bị văng
     bot.on('end', () => {
-        console.log('Mất kết nối, đang vào lại...')
+        console.log('Mất kết nối, đang tự động vào lại...')
         setTimeout(createBot, 5000)
     })
 
-    bot.on('error', err => console.log('Lỗi hệ thống: ' + err))
+    bot.on('error', err => console.log('Lỗi: ' + err))
 }
 
 createBot()
