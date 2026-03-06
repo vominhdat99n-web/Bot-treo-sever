@@ -9,24 +9,33 @@ function createBot() {
     })
 
     bot.on('spawn', () => {
-        console.log('Bot đã vào server và đang treo máy vĩnh viễn!')
-        // Chỉ cần nhảy nhẹ mỗi 5 phút để giữ kết nối ổn định
+        console.log('Bot đã vào! Đang thực hiện nhảy và xoay nhẹ để giữ kết nối.')
+        
+        // Cứ mỗi 30 giây thực hiện một chu kỳ vận động nhẹ
         setInterval(() => {
+            // Nhảy lên
             bot.setControlState('jump', true)
             setTimeout(() => bot.setControlState('jump', false), 500)
-        }, 300000)
+            
+            // Xoay nhẹ camera
+            const currentYaw = bot.entity.yaw
+            bot.look(currentYaw + 0.1, 0)
+        }, 30000) 
     })
 
     bot.on('chat', (username, message) => {
         if (username === bot.username) return
-        // Tự động chấp nhận TPA cho bạn và bạn bè
         if (message.toLowerCase().includes('tpa')) {
             bot.chat('/tpaccept')
         }
     })
 
-    bot.on('end', () => setTimeout(createBot, 10000))
-    bot.on('error', err => console.log('Lỗi: ' + err))
+    bot.on('end', () => {
+        console.log('Mất kết nối, đang tự động vào lại sau 5 giây...')
+        setTimeout(createBot, 5000)
+    })
+    
+    bot.on('error', err => console.log('Lỗi Bot: ' + err))
 }
 
 createBot()
