@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
   schedule:
-    # Cứ mỗi 6 tiếng GitHub sẽ tự khởi động lại bot một lần để đảm bảo 24/7
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
@@ -13,18 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Cập nhật lên v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Cập nhật lên v4
         with:
-          node-version: 18
+          node-version: 20 # Dùng Node 20 cho ổn định
 
       - name: Install dependencies
-        # Cài đặt tất cả thư viện có trong package.json
-        run: npm install
+        run: |
+          npm init -y
+          npm install mineflayer
 
       - name: Start Minecraft Bot
-        # Đảm bảo file bot của bạn tên là index.js, nếu tên khác thì sửa lại ở đây
-        run: node index.js
+        # QUAN TRỌNG: Kiểm tra tên file code của bạn là bot.js hay index.js
+        # Nếu file là bot.js thì sửa dòng dưới thành: node bot.js
+        run: node index.js 
         
