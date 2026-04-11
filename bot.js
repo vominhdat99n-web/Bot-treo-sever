@@ -3,7 +3,7 @@ const mineflayer = require('mineflayer');
 // Cấu hình thông tin Server của bạn ở đây
 const folder_config = {
     host: '191.96.231.4', // Thay bằng IP server của bạn
-    port: ,13244               // Cổng server (mặc định là 25565)
+    port: 13244,               // Cổng server (mặc định là 25565)
     username: 'Bot_Treo_247',  // Tên bot muốn đặt
     version: '1.21.1'          // Phiên bản Minecraft server của bạn
 };
